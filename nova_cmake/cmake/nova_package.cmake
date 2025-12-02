@@ -50,8 +50,10 @@ macro(nova_package)
      AND CUDA_nppidei_LIBRARY
      AND CUDA_nppig_LIBRARY
      AND CUDA_nppisu_LIBRARY)
+    set(NPP_FOUND TRUE)
     add_definitions(-DNPP_AVAILABLE)
   else()
+    set(NPP_FOUND FALSE)
     message(WARNING "[NPP] Not found")
   endif()
 
@@ -65,17 +67,19 @@ macro(nova_package)
 
   # --- Try to find OpenCV with CUDA ---
   if(OpenCV_CUDA_VERSION)
+    set(OpenCV_CUDA_FOUND TRUE)
     add_definitions(-DOPENCV_CUDA_AVAILABLE)
   else()
+    set(OpenCV_CUDA_FOUND FALSE)
     message(WARNING "[OpenCV CUDA] Not found")
   endif()
 
   # --- Try to find JETSON environment ---
   if(EXISTS "/etc/nv_tegra_release")
-    set(JETSON TRUE)
+    set(JETSON_FOUND TRUE)
     add_definitions(-DJETSON_AVAILABLE)
   else()
-    set(JETSON FALSE)
+    set(JETSON_FOUND FALSE)
     message(WARNING "[Jetson] Not found")
   endif()
 endmacro()

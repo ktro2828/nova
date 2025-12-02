@@ -6,14 +6,14 @@ find_package(autoware_cmake REQUIRED)
 nova_package()
 autoware_package()
 
-if(NOT JETSON
+if(NOT JETSON_FOUND
    AND NOT NVJPEG_FOUND
    AND NOT LibJpegTurbo_FOUND)
   message(FATAL_ERROR "No jpeg encoder found")
 endif()
 
 # --- JPEG encoder ---
-if(JETSON)
+if(JETSON_FOUND)
   include(FetchContent)
   FetchContent_Declare(
     cuda-api-wrappers
