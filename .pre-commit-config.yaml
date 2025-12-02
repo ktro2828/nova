@@ -78,6 +78,11 @@ repos:
         args: [--quiet]
         exclude: .cu
 
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.35.0
     hooks:
