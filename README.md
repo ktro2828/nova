@@ -1,3 +1,3 @@
-# ros2-project-template
+# NOVA
 
-Project template for ROS 2
+Next-gen Optimized Visual Accelerator.
