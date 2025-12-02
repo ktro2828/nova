@@ -13,9 +13,6 @@
 # the License.
 
 macro(nova_package)
-  find_package(autoware_cmake REQUIRED)
-  autoware_package()
-
   # Ensure local CMake modules (FindLibJpegTurbo.cmake, FindNVJPEG.cmake) are
   # discoverable
   list(APPEND CMAKE_MODULE_PATH "${nova_cmake_DIR}")
@@ -23,8 +20,9 @@ macro(nova_package)
   # --- Try to find JpegTurbo ---
   find_package(LibJpegTurbo)
   if(LibJpegTurbo_FOUND)
-    message("LibJpegTurbo found")
     add_definitions(-DTURBOJPEG_AVAILABLE)
+  else()
+    message(WARNING "[JpegTurbo] Not found")
   endif()
 
   # --- Try to find NVJPEG dependencies ---
@@ -37,7 +35,7 @@ macro(nova_package)
      AND CULIBOS)
     add_definitions(-DNVJPEG_AVAILABLE)
   else()
-    message("NVJPEG or its dependencies not found")
+    message(WARNING "[NVJPEG] Not found")
   endif()
 
   # --- Try to find NPP libraries ---
@@ -52,38 +50,32 @@ macro(nova_package)
      AND CUDA_nppidei_LIBRARY
      AND CUDA_nppig_LIBRARY
      AND CUDA_nppisu_LIBRARY)
-    message("NPP found")
     add_definitions(-DNPP_AVAILABLE)
+  else()
+    message(WARNING "[NPP] Not found")
   endif()
 
   # --- Try to find OpenCV ---
   if(OpenCV_FOUND)
-    message("OpenCV version: ${OpenCV_VERSION}")
     find_package(cv_bridge REQUIRED)
     add_definitions(-DOPENCV_AVAILABLE)
+  else()
+    message(WARNING "[OpenCV] Not found")
   endif()
 
   # --- Try to find OpenCV with CUDA ---
   if(OpenCV_CUDA_VERSION)
-    message("OpenCV CUDA version: ${OpenCV_CUDA_VERSION}")
     add_definitions(-DOPENCV_CUDA_AVAILABLE)
   else()
-    message("OpenCV CUDA not found")
+    message(WARNING "[OpenCV CUDA] Not found")
   endif()
 
   # --- Try to find JETSON environment ---
   if(EXISTS "/etc/nv_tegra_release")
     set(JETSON TRUE)
-    message(STATUS "Jetson platform detected")
     add_definitions(-DJETSON_AVAILABLE)
   else()
     set(JETSON FALSE)
-    message(STATUS "Non-Jetson platform detected")
-  endif()
-
-  if(NOT JETSON
-     AND NOT NVJPEG_FOUND
-     AND NOT LibJpegTurbo_FOUND)
-    message(FATAL_ERROR "no jpeg encoder found")
+    message(WARNING "[Jetson] Not found")
   endif()
 endmacro()
