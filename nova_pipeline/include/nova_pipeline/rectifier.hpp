@@ -15,7 +15,9 @@
 #ifndef NOVA_PIPELINE__RECTIFIER_HPP_
 #define NOVA_PIPELINE__RECTIFIER_HPP_
 
+#include <opencv2/calib3d.hpp>
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/msg/image.hpp>
@@ -27,6 +29,7 @@
 #endif
 
 #ifdef NPP_AVAILABLE
+#include <cuda_runtime.h>
 #include <nppdefs.h>
 #endif
 

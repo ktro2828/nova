@@ -14,6 +14,8 @@
 
 #include "nova_pipeline/rectifier.hpp"
 
+#include <opencv2/core/hal/interface.h>
+
 #include <iostream>
 #include <memory>
 
@@ -111,8 +113,9 @@ Image::UniquePtr OpenCVRectifierCPU::rectify(const Image & msg)
   result->step = msg.step;
   result->data.resize(msg.data.size());
 
-  cv::Mat src(msg.height, msg.width, CV_8UC3, (void *)msg.data.data());
-  cv::Mat dst(msg.height, msg.width, CV_8UC3, (void *)result->data.data());
+  // cv::Mat src(msg.height, msg.width, CV_8UC3, (void *)msg.data.data());
+  cv::Mat src(msg.height, msg.width, CV_8UC3, const_cast<unsigned char *>(msg.data.data()));
+  cv::Mat dst(msg.height, msg.width, CV_8UC3, reinterpret_cast<void *>(result->data.data()));
 
   cv::remap(src, dst, map_x_, map_y_, cv::INTER_LINEAR);
 
@@ -142,14 +145,14 @@ Image::UniquePtr OpenCVRectifierGPU::rectify(const Image & msg)
   result->step = msg.step;
   result->data.resize(msg.data.size());
 
-  cv::Mat src(msg.height, msg.width, CV_8UC3, (void *)msg.data.data());
+  cv::Mat src(msg.height, msg.width, CV_8UC3, const_cast<unsigned char *>(msg.data.data()));
   cv::cuda::GpuMat src_d = cv::cuda::GpuMat(src);
   cv::cuda::GpuMat dst_d = cv::cuda::GpuMat(cv::Size(msg.width, msg.height), src.type());
 
   cv::cuda::remap(src_d, dst_d, map_x_, map_y_, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
 
   // Copy back to host
-  cv::Mat dst(msg.height, msg.width, CV_8UC3, (void *)result->data.data());
+  cv::Mat dst(msg.height, msg.width, CV_8UC3, reinterpret_cast<void *>(result->data.data()));
   dst_d.download(dst);
 
   return result;
@@ -240,7 +243,7 @@ NPPRectifier::~NPPRectifier()
   cudaStreamDestroy(stream_);
 }
 
-NPPRectifier::rectify(const Image & msg)
+Image::UniquePtr NPPRectifier::rectify(const Image & msg)
 {
   nppSetStream(stream_);
 
