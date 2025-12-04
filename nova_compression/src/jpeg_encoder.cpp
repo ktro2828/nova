@@ -17,7 +17,6 @@
 #include <nova_common/helper.hpp>
 
 #include <cstring>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -228,14 +227,18 @@ CompressedImage::UniquePtr NvJpegEncoder::encode(const Image & msg, int quality,
   nvjpegEncoderParamsSetQuality(params_, quality, stream_);
 
   nvjpegInputFormat_t input_format;
-  if (format == ImageFormat::RGB) {
-    input_format = NVJPEG_INPUT_RGBI;
-  } else if (format == ImageFormat::BGR) {
-    input_format = NVJPEG_INPUT_BGRI;
-  } else {
-    std::cerr << "Specified ImageFormat is not supported" << std::endl;
+  switch (format) {
+    case ImageFormat::RGB:
+      input_format = NVJPEG_INPUT_RGBI;
+      break;
+    case ImageFormat::BGR:
+      input_format = NVJPEG_INPUT_BGRI;
+      break;
+    default:
+      throw std::runtime_error("Specified ImageFormat is not supported");
   }
-  setNVImage(msg);
+
+  set_nv_image(msg);
   CHECK_NVJPEG(nvjpegEncodeImage(
     handle_, state_, params_, &nv_image_, input_format, msg.width, msg.height, stream_));
 
