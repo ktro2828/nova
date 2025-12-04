@@ -18,6 +18,7 @@
 #include "nova_ros/task_queue.hpp"
 
 #include <nova_common/datatype.hpp>
+#include <nova_common/format.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -95,11 +96,11 @@ void ImgProcNode::determine_qos()
 
 void ImgProcNode::on_image(sensor_msgs::msg::Image::ConstSharedPtr msg, int32_t quality)
 {
-  compression::ImageFormat image_format;
+  ImageFormat image_format;
   if (msg->encoding == "rgb8") {
-    image_format = compression::ImageFormat::RGB;
+    image_format = ImageFormat::RGB;
   } else if (msg->encoding == "bgr8") {
-    image_format = compression::ImageFormat::BGR;
+    image_format = ImageFormat::BGR;
   } else {
     RCLCPP_ERROR_STREAM(this->get_logger(), "Unsupported image encoding: " << msg->encoding);
     return;

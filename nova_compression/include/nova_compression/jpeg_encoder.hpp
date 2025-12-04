@@ -16,6 +16,7 @@
 #define NOVA_COMPRESSION__JPEG_ENCODER_HPP_
 
 #include <nova_common/datatype.hpp>
+#include <nova_common/format.hpp>
 
 #include <string>
 #include <utility>
@@ -41,11 +42,6 @@
 
 namespace nova::compression
 {
-/**
- * @brief Image format enum.
- */
-enum class ImageFormat { RGB, BGR };
-
 /**
  * @brief Base class for JPEG encoders.
  */
