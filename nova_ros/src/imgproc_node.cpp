@@ -108,18 +108,23 @@ void ImgProcNode::on_image(sensor_msgs::msg::Image::ConstSharedPtr msg, int32_t 
 
   if (compress_task_queue_) {
     compress_task_queue_->add_task([this, msg, quality, image_format]() {
-      auto raw_comp_img = raw_jpeg_encoder_->encode(*msg, quality, image_format);
+      auto raw_comp_img = this->raw_jpeg_encoder_->encode(*msg, quality, image_format);
       raw_compressed_image_publisher_->publish(std::move(raw_comp_img));
     });
   }
 
   if (rectify_task_queue_) {
+    if (!rectifier_) {
+      RCLCPP_WARN(this->get_logger(), "Rectifier not initialized");
+      return;
+    }
+
     rectify_task_queue_->add_task([this, msg, quality, image_format]() {
-      auto rect_img = rectifier_->rectify(*msg);
-      auto rect_info = rectifier_->camera_info();
+      auto rect_img = this->rectifier_->rectify(*msg);
+      auto rect_info = this->rectifier_->camera_info();
       rect_info.header = rect_img->header;
 
-      auto rect_comp_img = rectified_jpeg_encoder_->encode(*rect_img, quality, image_format);
+      auto rect_comp_img = this->rectified_jpeg_encoder_->encode(*rect_img, quality, image_format);
 
       rectified_image_publisher_->publish(std::move(rect_img));
       camera_info_publisher_->publish(std::move(rect_info));
