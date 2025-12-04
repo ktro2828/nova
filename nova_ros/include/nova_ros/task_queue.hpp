@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NOVA_ROS__TASKE_QUEUE_HPP_
-#define NOVA_ROS__TASKE_QUEUE_HPP_
+#ifndef NOVA_ROS__TASK_QUEUE_HPP_
+#define NOVA_ROS__TASK_QUEUE_HPP_
 
 #include <condition_variable>
 #include <functional>
@@ -96,4 +96,4 @@ private:
   size_t queue_size_;
 };
 }  // namespace nova::ros
-#endif  // NOVA_ROS__TASKE_QUEUE_HPP_
+#endif  // NOVA_ROS__TASK_QUEUE_HPP_

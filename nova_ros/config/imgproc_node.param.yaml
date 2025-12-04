@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    max_task_queue_size: 5
+    jpeg_encoder:
+      quality: 90
+    rectifier:
+      alpha: 0.0
