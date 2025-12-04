@@ -15,8 +15,7 @@
 #ifndef NOVA_COMPRESSION__JPEG_ENCODER_HPP_
 #define NOVA_COMPRESSION__JPEG_ENCODER_HPP_
 
-#include <sensor_msgs/msg/compressed_image.hpp>
-#include <sensor_msgs/msg/image.hpp>
+#include <nova_common/datatype.hpp>
 
 #include <string>
 
@@ -41,9 +40,6 @@
 
 namespace nova::compression
 {
-using Image = sensor_msgs::msg::Image;
-using CompressedImage = sensor_msgs::msg::CompressedImage;
-
 enum class ImageFormat { RGB, BGR };
 
 #ifdef TURBOJPEG_AVAILABLE

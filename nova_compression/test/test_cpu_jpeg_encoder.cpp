@@ -14,18 +14,15 @@
 
 #include "nova_compression/jpeg_encoder.hpp"
 
-#include <sensor_msgs/msg/compressed_image.hpp>
-#include <sensor_msgs/msg/image.hpp>
-
 #include <gtest/gtest.h>
 
 #ifdef TURBOJPEG_AVAILABLE
 namespace nova::compression
 {
 // Helper to construct a simple RGB image with deterministic data
-static sensor_msgs::msg::Image make_test_image_rgb8(std::uint32_t width, std::uint32_t height)
+static Image make_test_image_rgb8(std::uint32_t width, std::uint32_t height)
 {
-  sensor_msgs::msg::Image img;
+  Image img;
   img.width = width;
   img.height = height;
   img.encoding = "rgb8";

@@ -14,9 +14,6 @@
 
 #include "nova_pipeline/rectifier.hpp"
 
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
-
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -26,10 +23,9 @@
 
 namespace nova::pipeline
 {
-static sensor_msgs::msg::CameraInfo make_identity_camera_info(
-  std::uint32_t width, std::uint32_t height)
+static CameraInfo make_identity_camera_info(std::uint32_t width, std::uint32_t height)
 {
-  sensor_msgs::msg::CameraInfo info;
+  CameraInfo info;
   info.width = width;
   info.height = height;
 
@@ -51,9 +47,9 @@ static sensor_msgs::msg::CameraInfo make_identity_camera_info(
   return info;
 }
 
-static sensor_msgs::msg::Image make_rgb8_image(std::uint32_t width, std::uint32_t height)
+static Image make_rgb8_image(std::uint32_t width, std::uint32_t height)
 {
-  sensor_msgs::msg::Image img;
+  Image img;
   img.width = width;
   img.height = height;
   img.encoding = "rgb8";

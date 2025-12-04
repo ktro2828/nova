@@ -15,12 +15,10 @@
 #ifndef NOVA_PIPELINE__RECTIFIER_HPP_
 #define NOVA_PIPELINE__RECTIFIER_HPP_
 
+#include <nova_common/datatype.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-
-#include <sensor_msgs/msg/camera_info.hpp>
-#include <sensor_msgs/msg/image.hpp>
 
 #include <optional>
 
@@ -35,9 +33,6 @@
 
 namespace nova::pipeline
 {
-using CameraInfo = sensor_msgs::msg::CameraInfo;
-using Image = sensor_msgs::msg::Image;
-
 class RectifierBase
 {
 public:

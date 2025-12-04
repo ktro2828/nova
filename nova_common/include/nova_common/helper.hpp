@@ -18,7 +18,7 @@
 #include <cstdio>
 #include <iostream>
 
-namespace nova::common
+namespace nova
 {
 /**
  * @brief Macro to check for errors and print a message if the condition is true.
@@ -68,5 +68,5 @@ namespace nova::common
       exit(1);                                                                            \
     }                                                                                     \
   }
-}  // namespace nova::common
+}  // namespace nova
 #endif  // NOVA_COMMON__HELPER_HPP_
