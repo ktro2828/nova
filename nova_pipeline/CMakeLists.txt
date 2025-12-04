@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 project(nova_pipeline)
 
 find_package(nova_cmake REQUIRED)
@@ -14,36 +14,50 @@ if(NOT OpenCV_FOUND
 endif()
 
 if(JETSON_FOUND)
-  ament_auto_add_library(rectifier SHARED src/rectifier.cpp)
-  target_include_directories(rectifier PUBLIC ${CUDA_INCLUDE_DIR}
-                                              ${OpenCV_INCLUDE_DIRS})
+  ament_auto_add_library(${PROJECT_NAME} SHARED src/rectifier.cpp)
+  target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+           $<INSTALL_INTERFACE:include> ${CUDA_INCLUDE_DIR}
+           ${CUDA_NPP_INCLUDES} ${OpenCV_INCLUDE_DIRS})
   target_link_directories(
-    rectifier PUBLIC ${SYS_ROOT}/lib/aarch64-linux-gnu
+    ${PROJECT_NAME} PUBLIC ${SYS_ROOT}/lib/aarch64-linux-gnu
     ${SYS_ROOT}/usr/lib/aarch64-linux-gnu
     ${SYS_ROOT}/usr/lib/aarch64-linux-gnu/tegra)
   target_link_libraries(
-    rectifier ${CUDA_nppidei_LIBRARY} ${CUDA_nppig_LIBRARY}
-    ${CUDA_nppicc_LIBRARY} ${CUDA_nppisu_LIBRARY} ${OpenCV_LIBRARIES})
+    ${PROJECT_NAME}
+    ${CUDA_nppidei_LIBRARY}
+    ${CUDA_nppig_LIBRARY}
+    ${CUDA_nppicc_LIBRARY}
+    ${CUDA_nppisu_LIBRARY}
+    ${OpenCV_LIBRARIES}
+    nova_common::nova_common)
 else()
-  ament_auto_add_library(rectifier SHARED src/rectifier.cpp)
+  ament_auto_add_library(${PROJECT_NAME} SHARED src/rectifier.cpp)
   target_include_directories(
-    rectifier PUBLIC ${CUDA_INCLUDE_DIR} ${CUDA_NPP_INCLUDES}
-                     ${OpenCV_INCLUDE_DIRS})
+    ${PROJECT_NAME}
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+           $<INSTALL_INTERFACE:include> ${CUDA_INCLUDE_DIR}
+           ${CUDA_NPP_INCLUDES} ${OpenCV_INCLUDE_DIRS})
   target_link_libraries(
-    rectifier ${CUDA_nppidei_LIBRARY} ${CUDA_nppig_LIBRARY}
-    ${CUDA_nppicc_LIBRARY} ${CUDA_nppisu_LIBRARY} ${OpenCV_LIBRARIES})
+    ${PROJECT_NAME}
+    ${CUDA_nppidei_LIBRARY}
+    ${CUDA_nppig_LIBRARY}
+    ${CUDA_nppicc_LIBRARY}
+    ${CUDA_nppisu_LIBRARY}
+    ${OpenCV_LIBRARIES}
+    nova_common::nova_common)
 endif()
 
-install(
-  TARGETS rectifier
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "")
+install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
+install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
+ament_export_targets(export_${PROJECT_NAME})
+ament_export_dependencies(nova_common)
 ament_package()

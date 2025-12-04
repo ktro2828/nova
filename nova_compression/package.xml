@@ -12,6 +12,7 @@
 
   <depend>libopencv-dev</depend>
   <depend>libturbojpeg</depend>
+  <depend>nova_common</depend>
   <depend>sensor_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

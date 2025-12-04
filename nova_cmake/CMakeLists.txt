@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.14)
 project(nova_cmake)
 
 find_package(autoware_cmake REQUIRED)
 autoware_package()
 
-list(APPEND ${PROJECT_NAME}_CONFIG_EXTRAS
-  "nova_cmake-extras.cmake"
-)
+list(APPEND ${PROJECT_NAME}_CONFIG_EXTRAS "nova_cmake-extras.cmake")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -14,6 +14,8 @@
 
 #include "nova_pipeline/rectifier.hpp"
 
+#include <nova_common/helper.hpp>
+
 #include <opencv2/core/hal/interface.h>
 
 #include <iostream>
@@ -38,18 +40,6 @@ namespace nova::pipeline
 {
 namespace
 {
-#define CHECK_NPP(status)                                                              \
-  if (status != NPP_SUCCESS) {                                                         \
-    std::cerr << "NPP error: " << status << " (" << __FILE__ << ":" << __LINE__ << ")" \
-              << std::endl;                                                            \
-  }
-
-#define CHECK_CUDA(status)                                                                         \
-  if (status != cudaSuccess) {                                                                     \
-    std::cerr << "CUDA error: " << cudaGetErrorName(status) << " (" << __FILE__ << ":" << __LINE__ \
-              << ")" << std::endl;                                                                 \
-  }
-
 static CameraInfo compute_maps(
   const CameraInfo & info, float * map_x, float * map_y, double alpha = 0.0)
 {
