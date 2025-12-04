@@ -53,11 +53,6 @@ ImgProcNode::~ImgProcNode()
 
 void ImgProcNode::determine_qos()
 {
-  // parameters
-  size_t max_task_queue_size = this->declare_parameter<int64_t>("max_task_queue_size", 5);
-  int32_t quality = this->declare_parameter<int32_t>("jpeg_encoder.quality", 90);
-  double alpha = this->declare_parameter<double>("rectifier.alpha", 0.0);
-
   auto image_topic = this->get_node_topics_interface()->resolve_topic_name("image_raw", false);
   auto info_topic = this->get_node_topics_interface()->resolve_topic_name("camera_info", false);
 
@@ -66,6 +61,11 @@ void ImgProcNode::determine_qos()
   if (!image_qos_opt || !info_qos_opt) {
     return;
   } else {
+    // parameters
+    size_t max_task_queue_size = this->declare_parameter<int64_t>("max_task_queue_size", 5);
+    int32_t quality = this->declare_parameter<int32_t>("jpeg_encoder.quality", 90);
+    double alpha = this->declare_parameter<double>("rectifier.alpha", 0.0);
+
     // initialize task queues & workers
     compress_task_queue_.emplace(max_task_queue_size);
     compress_worker_.emplace(&TaskQueue::run, &compress_task_queue_.value());
