@@ -118,8 +118,7 @@ public:
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
 private:
-  // void setNVJPEGParams(int quality, ImageFormat format);
-  void set_nv_image(const Image & msg);
+  nvjpegImage_t to_nv_image(const Image & msg);
 
   cudaStream_t stream_;
   nvjpegHandle_t handle_;
@@ -127,7 +126,6 @@ private:
   nvjpegEncoderParams_t params_;
   nvjpegInputFormat_t input_format_;
   nvjpegChromaSubsampling_t subsampling_;
-  nvjpegImage_t nv_image_;
 };
 #endif  // NVJPEG_AVAILABLE
 }  // namespace nova::compression

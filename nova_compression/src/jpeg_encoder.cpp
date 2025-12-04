@@ -238,9 +238,10 @@ CompressedImage::UniquePtr NvJpegEncoder::encode(const Image & msg, int quality,
       throw std::runtime_error("Specified ImageFormat is not supported");
   }
 
-  set_nv_image(msg);
+  auto nv_image = to_nv_image(msg);
+
   CHECK_NVJPEG(nvjpegEncodeImage(
-    handle_, state_, params_, &nv_image_, input_format, msg.width, msg.height, stream_));
+    handle_, state_, params_, &nv_image, input_format, msg.width, msg.height, stream_));
 
   unsigned long out_buf_size = 0;
 
@@ -254,23 +255,26 @@ CompressedImage::UniquePtr NvJpegEncoder::encode(const Image & msg, int quality,
   return output;
 }
 
-void NvJpegEncoder::set_nv_image(const Image & msg)
+nvjpegImage_t NvJpegEncoder::to_nv_image(const Image & msg)
 {
-  if (nv_image_.channel[0] == nullptr) {
+  nvjpegImage_t nv_image;
+
+  if (nv_image.channel[0] == nullptr) {
     CHECK_CUDA(
-      cudaMallocAsync(reinterpret_cast<void **>(&nv_image_.channel[0]), msg.data.size(), stream_));
+      cudaMallocAsync(reinterpret_cast<void **>(&nv_image.channel[0]), msg.data.size(), stream_));
   }
 
-  CHECK_CUDA(cudaMemsetAsync(nv_image_.channel[0], 0, msg.data.size(), stream_));
+  CHECK_CUDA(cudaMemsetAsync(nv_image.channel[0], 0, msg.data.size(), stream_));
 
   CHECK_CUDA(cudaMemcpyAsync(
-    nv_image_.channel[0], msg.data.data(), msg.data.size(), cudaMemcpyHostToDevice, stream_));
+    nv_image.channel[0], msg.data.data(), msg.data.size(), cudaMemcpyHostToDevice, stream_));
 
   // int channels = image.size() / (image.width * image.height);
   int channels = 3;
 
   // Assuming RGBI/BGRI
-  nv_image_.pitch[0] = msg.width * channels;
+  nv_image.pitch[0] = msg.width * channels;
+  return nv_image;
 }
 #endif  // NVJPEG_AVAILABLE
 }  // namespace nova::compression
