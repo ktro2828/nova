@@ -18,6 +18,7 @@
 #include <nova_common/datatype.hpp>
 
 #include <string>
+#include <utility>
 
 #if defined(JETSON_AVAILABLE) || defined(NVJPEG_AVAILABLE)
 #include <cuda_runtime.h>
@@ -40,20 +41,36 @@
 
 namespace nova::compression
 {
+/**
+ * @brief Image format enum.
+ */
 enum class ImageFormat { RGB, BGR };
+
+/**
+ * @brief Base class for JPEG encoders.
+ */
+class JpegEncoderBase
+{
+public:
+  explicit JpegEncoderBase(std::string name) : name_(std::move(name)) {}
+  virtual CompressedImage::UniquePtr encode(const Image & img, int quality, ImageFormat format) = 0;
+
+protected:
+  std::string name_;
+};
 
 #ifdef TURBOJPEG_AVAILABLE
 /**
  * @brief CPU-based JPEG encoder using TurboJPEG library.
  */
-class CpuJpegEncoder
+class CpuJpegEncoder final : public JpegEncoderBase
 {
 public:
-  CpuJpegEncoder();
+  CpuJpegEncoder(std::string name);
   ~CpuJpegEncoder();
 
   CompressedImage::UniquePtr encode(
-    const Image & msg, int quality = 90, int format = TJPF_RGB, int sampling = TJ_420);
+    const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
 private:
   tjhandle handle_;         //!< TurboJPEG handle.
@@ -63,15 +80,17 @@ private:
 #endif  // TURBOJPEG_AVAILABLE
 
 #ifdef JETSON_AVAILABLE
-class JetsonJpegEncoder
+/**
+ * @brief JPEG encoder using Jetson Inference library.
+ */
+class JetsonJpegEncoder final : public JpegEncoderBase
 {
 public:
   explicit JetsonJpegEncoder(std::string name);
   ~JetsonJpegEncoder();
 
   CompressedImage::UniquePtr encode(
-    const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB);
-  void set_cuda_stream(cuda::stream::handle_t & stream);
+    const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
 private:
   NvJPEGEncoder * encoder_;            //!< NvJPEG encoder handle.
@@ -90,15 +109,17 @@ private:
 #endif  // JETSON_AVAILABLE
 
 #ifdef NVJPEG_AVAILABLE
-class NvJpegEncoder
+/**
+ * JPEG encoder using NVIDIA NVJPEG library.
+ */
+class NvJpegEncoder final : public JpegEncoderBase
 {
 public:
-  NvJpegEncoder();
+  NvJpegEncoder(std::string name);
   ~NvJpegEncoder();
 
   CompressedImage::UniquePtr encode(
-    const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB);
-  void set_cuda_stream(cuda::stream::handle_t & stream);
+    const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
 private:
   // void setNVJPEGParams(int quality, ImageFormat format);

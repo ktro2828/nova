@@ -44,14 +44,10 @@ static Image make_test_image_rgb8(std::uint32_t width, std::uint32_t height)
 
 TEST(CpuJpegEncoderTest, EncodeBasicRgbImage)
 {
-  CpuJpegEncoder encoder;
+  CpuJpegEncoder encoder("cpu_encoder");
 
   const auto img = make_test_image_rgb8(16, 16);
-  auto compressed = encoder.encode(
-    img,
-    /*quality=*/90,
-    /*format=*/TJPF_RGB,
-    /*sampling=*/TJ_420);
+  auto compressed = encoder.encode(img, 90, ImageFormat::RGB);
 
   ASSERT_NE(compressed, nullptr) << "Encoder returned null CompressedImage";
   EXPECT_EQ(compressed->format, "jpeg");
@@ -66,23 +62,19 @@ TEST(CpuJpegEncoderTest, EncodeBasicRgbImage)
 
 TEST(CpuJpegEncoderTest, EncodeDifferentQualityAndSampling)
 {
-  CpuJpegEncoder encoder;
+  CpuJpegEncoder encoder("cpu_encoder");
 
   const auto img = make_test_image_rgb8(32, 24);
 
   // Encode with quality 50 and 4:4:4 sampling for variety
-  auto compressed = encoder.encode(
-    img,
-    /*quality=*/50,
-    /*format=*/TJPF_RGB,
-    /*sampling=*/TJ_444);
+  auto compressed = encoder.encode(img, 50, ImageFormat::RGB);
 
   ASSERT_NE(compressed, nullptr);
   EXPECT_EQ(compressed->format, "jpeg");
   EXPECT_GT(compressed->data.size(), 0U);
 
   // Optionally compare sizes between different settings
-  auto compressed_90_420 = encoder.encode(img, 90, TJPF_RGB, TJ_420);
+  auto compressed_90_420 = encoder.encode(img, 90, ImageFormat::RGB);
   ASSERT_NE(compressed_90_420, nullptr);
   EXPECT_GT(compressed_90_420->data.size(), 0U);
 

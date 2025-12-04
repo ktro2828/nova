@@ -16,11 +16,11 @@
 
 #include <nova_common/helper.hpp>
 
-#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 #if defined(JETSON_AVAILABLE) || defined(NVJPEG_AVAILABLE)
 #include <nppi_color_conversion.h>
@@ -30,7 +30,8 @@
 namespace nova::compression
 {
 #ifdef TURBOJPEG_AVAILABLE
-CpuJpegEncoder::CpuJpegEncoder() : buffer_(nullptr), size_(0)
+CpuJpegEncoder::CpuJpegEncoder(std::string name)
+: JpegEncoderBase(std::move(name)), buffer_(nullptr), size_(0)
 {
   handle_ = tjInitCompress();
 }
@@ -44,8 +45,21 @@ CpuJpegEncoder::~CpuJpegEncoder()
 }
 
 CompressedImage::UniquePtr CpuJpegEncoder::encode(
-  const Image & msg, int quality, int format, int sampling)
+  const Image & msg, int quality, ImageFormat format)
 {
+  int tjpf;
+  switch (format) {
+    case ImageFormat::RGB:
+      tjpf = TJPF_RGB;
+      break;
+    case ImageFormat::BGR:
+      tjpf = TJPF_BGR;
+      break;
+    default:
+      throw std::invalid_argument("Unsupported image format");
+  }
+  constexpr int sampling = TJ_420;
+
   CompressedImage::UniquePtr output = std::make_unique<CompressedImage>();
   output->header = msg.header;
   output->format = "jpeg";
@@ -56,7 +70,7 @@ CompressedImage::UniquePtr CpuJpegEncoder::encode(
   }
 
   int result = tjCompress2(
-    handle_, msg.data.data(), msg.width, 0, msg.height, format, &buffer_, &size_, sampling, quality,
+    handle_, msg.data.data(), msg.width, 0, msg.height, tjpf, &buffer_, &size_, sampling, quality,
     TJFLAG_FASTDCT);
 
 #if defined(LIBJPEG_TURBO_VERSION) && (LIBJPEG_TURBO_VERSION >= 2)
@@ -73,10 +87,10 @@ CompressedImage::UniquePtr CpuJpegEncoder::encode(
 #endif  // TURBOJPEG_AVAILABLE
 
 #ifdef JETSON_AVAILABLE
-JetsonJpegEncoder::JetsonJpegEncoder(std::string name)
-: stream_(cuda::device::current().get().create_stream(cuda::stream::sync))
+JetsonJpegEncoder::JetsonJpegEncoder(std::string name) : JpegEncoderBase(std::move(name)),
 {
-  encoder_ = NvJPEGEncoder::createJPEGEncoder(name.c_str());
+  CHECK_CUDA(cudaStreamCreate(&stream_));
+  encoder_ = NvJPEGEncoder::createJPEGEncoder(name_.c_str());
 }
 
 JetsonJpegEncoder::~JetsonJpegEncoder()
@@ -87,6 +101,7 @@ JetsonJpegEncoder::~JetsonJpegEncoder()
   for (auto & p : yuv_d_) {
     nppiFree(p);
   }
+  CHECK_CUDA(cudaStreamDestroy(stream_));
 }
 
 CompressedImage::UniquePtr JetsonJpegEncoder::encode(const Image & msg, int quality, int format)
@@ -181,16 +196,10 @@ CompressedImage::UniquePtr JetsonJpegEncoder::encode(const Image & msg, int qual
 
   return output;
 }
-
-void JetsonCompressor::set_cuda_stream(cuda::stream::handle_t & stream)
-{
-  stream_ = cuda::stream::wrap(
-    cuda::device::current::get().id(), cuda::context::current::get().handle(), stream);
-}
 #endif  // JETSON_AVAILABLE
 
 #ifdef NVJPEG_AVAILABLE
-NvJpegEncoder::NvJpegEncoder()
+NvJpegEncoder::NvJpegEncoder(std::string name) : JpegEncoderBase(std::move(name))
 {
   CHECK_CUDA(cudaStreamCreate(&stream_));
   CHECK_NVJPEG(nvjpegCreateSimple(&handle_));
@@ -259,12 +268,6 @@ void NvJpegEncoder::set_nv_image(const Image & msg)
 
   // Assuming RGBI/BGRI
   nv_image_.pitch[0] = msg.width * channels;
-}
-
-void NvJpegEncoder::set_cuda_stream(const cudaStream_t & stream)
-{
-  CHECK_CUDA(cudaStreamDestroy(stream_));
-  stream_ = stream;
 }
 #endif  // NVJPEG_AVAILABLE
 }  // namespace nova::compression
