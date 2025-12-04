@@ -77,8 +77,15 @@ install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_ros REQUIRED)
+
+  if(LibJpegTurbo_FOUND)
+    ament_add_gtest(test_cpu_jpeg_encoder test/test_cpu_jpeg_encoder.cpp)
+    target_include_directories(
+      test_cpu_jpeg_encoder
+      PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+    target_link_libraries(test_cpu_jpeg_encoder ${PROJECT_NAME})
+  endif()
 endif()
 
 ament_export_include_directories(include)

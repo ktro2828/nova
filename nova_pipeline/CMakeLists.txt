@@ -58,8 +58,13 @@ install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_ros REQUIRED)
+
+  ament_add_gtest(test_rectifier_cpu test/test_rectifier_cpu.cpp)
+  target_include_directories(
+    test_rectifier_cpu
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+  target_link_libraries(test_rectifier_cpu ${PROJECT_NAME})
 endif()
 
 ament_export_include_directories(include)
