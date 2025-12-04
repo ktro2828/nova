@@ -4,6 +4,7 @@ project(nova_pipeline)
 find_package(nova_cmake REQUIRED)
 find_package(autoware_cmake REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(CUDAToolkit REQUIRED)
 nova_package()
 autoware_package()
 
@@ -31,6 +32,7 @@ if(JETSON_FOUND)
     ${CUDA_nppicc_LIBRARY}
     ${CUDA_nppisu_LIBRARY}
     ${OpenCV_LIBRARIES}
+    CUDA::cudart
     nova_common::nova_common)
 else()
   ament_auto_add_library(${PROJECT_NAME} SHARED src/rectifier.cpp)
@@ -46,10 +48,12 @@ else()
     ${CUDA_nppicc_LIBRARY}
     ${CUDA_nppisu_LIBRARY}
     ${OpenCV_LIBRARIES}
+    CUDA::cudart
     nova_common::nova_common)
 endif()
 
-set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "")
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+                                             $<INSTALL_INTERFACE:include>)
 install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
 
@@ -58,6 +62,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
 ament_export_targets(export_${PROJECT_NAME})
-ament_export_dependencies(nova_common)
+ament_export_dependencies(nova_common OpenCV CUDAToolkit)
 ament_package()

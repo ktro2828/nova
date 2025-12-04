@@ -70,7 +70,8 @@ else()
     $<$<BOOL:${NVJPEG_FOUND}>:${CULIBOS}>
     nova_common::nova_common)
 endif()
-set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "")
+set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+                                             $<INSTALL_INTERFACE:include>)
 
 install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})
 install(DIRECTORY include/${PROJECT_NAME} DESTINATION include)
@@ -80,6 +81,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
 ament_export_targets(export_${PROJECT_NAME})
 ament_export_dependencies(nova_common)
 ament_package()
