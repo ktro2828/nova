@@ -41,7 +41,7 @@ public:
 
 private:
   void determine_qos();
-  void on_image(Image::ConstSharedPtr msg, int32_t quality);
+  void on_image(Image::ConstSharedPtr msg, int quality);
   void on_camera_info(CameraInfo::ConstSharedPtr msg, double alpha);
 
   // --- Rectifier ---

@@ -62,8 +62,9 @@ void ImgProcNode::determine_qos()
     return;
   } else {
     // parameters
-    size_t max_task_queue_size = this->declare_parameter<int64_t>("max_task_queue_size", 5);
-    int32_t quality = this->declare_parameter<int32_t>("jpeg_encoder.quality", 90);
+    size_t max_task_queue_size =
+      static_cast<size_t>(this->declare_parameter<int>("max_task_queue_size", 5));
+    int quality = this->declare_parameter<int>("jpeg_encoder.quality", 90);
     double alpha = this->declare_parameter<double>("rectifier.alpha", 0.0);
 
     // initialize task queues & workers
@@ -94,7 +95,7 @@ void ImgProcNode::determine_qos()
   }
 }
 
-void ImgProcNode::on_image(sensor_msgs::msg::Image::ConstSharedPtr msg, int32_t quality)
+void ImgProcNode::on_image(sensor_msgs::msg::Image::ConstSharedPtr msg, int quality)
 {
   ImageFormat image_format;
   if (msg->encoding == "rgb8") {
