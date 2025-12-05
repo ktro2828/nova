@@ -89,11 +89,11 @@ public:
   }
 
 private:
-  std::queue<std::function<void()>> tasks_;
-  std::mutex mutex_;
-  std::condition_variable condition_;
-  bool request_stop_{false};
-  size_t queue_size_;
+  std::queue<std::function<void()>> tasks_;  //!< The task queue.
+  std::mutex mutex_;                         //!< The mutex for thread safety.
+  std::condition_variable condition_;        //!< The condition variable for thread synchronization.
+  bool request_stop_{false};                 //!< Flag indicating whether the task queue is stopped.
+  size_t queue_size_;                        //!< The maximum size of the task queue.
 };
 }  // namespace nova::ros
 #endif  // NOVA_ROS__TASK_QUEUE_HPP_

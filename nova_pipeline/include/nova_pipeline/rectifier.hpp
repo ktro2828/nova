@@ -33,62 +33,173 @@
 
 namespace nova::pipeline
 {
+/**
+ * @brief Base class for rectifiers.
+ */
 class RectifierBase
 {
 public:
+  /**
+   * @brief Destructor.
+   */
   virtual ~RectifierBase() {}
+
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   virtual const char * backend() const noexcept = 0;
+
+  /**
+   * @brief Rectify the image.
+   *
+   * @param msg The input image.
+   * @return The rectified image.
+   */
   virtual Image::UniquePtr rectify(const Image & msg) = 0;
+
+  /**
+   * @brief Check if the camera information is ready.
+   *
+   * @return True if camera information is ready, false otherwise.
+   */
   bool is_camera_info_ready() const noexcept { return camera_info_rect_.has_value(); }
-  CameraInfo & camera_info() { return camera_info_rect_.value(); }
+
+  /**
+   * @brief Get the camera information.
+   *
+   * @return The camera information.
+   */
+  CameraInfo camera_info() { return camera_info_rect_.value(); }
+
+  /**
+   * @brief Get the read-only reference to camera information.
+   *
+   * @return The read-only reference to camera information.
+   */
   const CameraInfo & camera_info() const { return camera_info_rect_.value(); }
 
 protected:
-  std::optional<CameraInfo> camera_info_rect_{std::nullopt};
+  std::optional<CameraInfo> camera_info_rect_{
+    std::nullopt};  //!< Camera information for rectification.
 };
 
+/**
+ * @brief OpenCV rectifier for CPU.
+ */
 class OpenCVRectifierCPU : public RectifierBase
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param info Camera information for rectification.
+   * @param alpha Rectification alpha parameter.
+   */
   explicit OpenCVRectifierCPU(const CameraInfo & info, double alpha = 0.0);
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
+  /**
+   * @brief Rectify the input image.
+   *
+   * @param msg The input image to be rectified.
+   * @return The rectified image.
+   */
   Image::UniquePtr rectify(const Image & msg) override;
 
 private:
-  cv::Mat map_x_;
-  cv::Mat map_y_;
-  cv::Mat camera_intrinsics_;
-  cv::Mat distortion_coeffs_;
+  cv::Mat map_x_;              //!< Map for x-coordinate rectification.
+  cv::Mat map_y_;              //!< Map for y-coordinate rectification.
+  cv::Mat camera_intrinsics_;  //!< Camera intrinsics matrix.
+  cv::Mat distortion_coeffs_;  //!< Distortion coefficients matrix.
 };
 
 #ifdef OPENCV_CUDA_AVAILABLE
+/**
+ * @brief OpenCV-based rectifier using CUDA.
+ */
 class OpenCVRectifierGPU : public RectifierBase
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param info Camera information for rectification.
+   * @param alpha Rectification alpha parameter.
+   */
   explicit OpenCVRectifierGPU(const CameraInfo & info, double alpha = 0.0);
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
+  /**
+   * @brief Rectify the input image using CUDA.
+   *
+   * @param msg The input image to be rectified.
+   * @return The rectified image.
+   */
   Image::UniquePtr rectify(const Image & msg) override;
 
 private:
-  cv::cuda::GpuMat map_x_;
-  cv::cuda::GpuMat map_y_;
+  cv::cuda::GpuMat map_x_;  //!< Map for x-coordinate rectification.
+  cv::cuda::GpuMat map_y_;  //!< Map for y-coordinate rectification.
 };
-#endif
+#endif  // OPENCV_CUDA_AVAILABLE
 
 #if NPP_AVAILABLE
+/**
+ * @brief NVIDIA NPP-based rectifier.
+ */
 class NPPRectifier : public RectifierBase
 {
 public:
+  /**
+   * @brief Constructor for NPPRectifier.
+   *
+   * @param width The width of the input image.
+   * @param height The height of the input image.
+   * @param map_x The x-coordinate map.
+   * @param map_y The y-coordinate map.
+   */
   NPPRectifier(int width, int height, const Npp32f * map_x, const Npp32f * map_y);
+
+  /**
+   * @brief Constructor for NPPRectifier.
+   *
+   * @param info The camera information.
+   * @param alpha The alpha value.
+   */
   explicit NPPRectifier(const CameraInfo & info, double alpha = 0.0);
+
+  /**
+   * @brief Destructor for NPPRectifier.
+   */
   ~NPPRectifier();
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
+  /**
+   * @brief Rectify the input image.
+   *
+   * @param msg The input image.
+   * @return The rectified image.
+   */
   Image::UniquePtr rectify(const Image & msg) override;
 
 private:
@@ -103,6 +214,6 @@ private:
 
   cudaStream_t stream_;  //!< CUDA stream for asynchronous operations
 };
-#endif
+#endif  // NPP_AVAILABLE
 }  // namespace nova::pipeline
 #endif  // NOVA_PIPELINE__RECTIFIER_HPP_

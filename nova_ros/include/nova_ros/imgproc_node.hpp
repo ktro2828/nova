@@ -33,15 +33,44 @@
 
 namespace nova::ros
 {
+/**
+ * @brief Image processing node.
+ */
 class ImgProcNode : public rclcpp::Node
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param options The node options.
+   */
   explicit ImgProcNode(const rclcpp::NodeOptions & options);
+
+  /**
+   * @brief Destructor.
+   */
   ~ImgProcNode();
 
 private:
+  /**
+   * @brief Determine the quality of service.
+   */
   void determine_qos();
+
+  /**
+   * @brief Callback for image messages.
+   *
+   * @param msg The image message.
+   * @param quality The quality of the JPEG encoding.
+   */
   void on_image(Image::ConstSharedPtr msg, int quality);
+
+  /**
+   * @brief Callback for camera info messages.
+   *
+   * @param msg The camera info message.
+   * @param alpha The alpha value for rectification.
+   */
   void on_camera_info(CameraInfo::ConstSharedPtr msg, double alpha);
 
   // --- Rectifier ---

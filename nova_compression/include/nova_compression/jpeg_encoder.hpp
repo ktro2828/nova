@@ -48,12 +48,32 @@ namespace nova::compression
 class JpegEncoderBase
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param name The encoder name.
+   */
   explicit JpegEncoderBase(std::string name) : name_(std::move(name)) {}
+
+  /**
+   * @brief Encode an image into JPEG format.
+   *
+   * @param img The input image.
+   * @param quality The JPEG quality level (default: 90).
+   * @param format The image format (default: RGB).
+   * @return Unique pointer to the encoded JPEG image.
+   */
   virtual CompressedImage::UniquePtr encode(const Image & img, int quality, ImageFormat format) = 0;
+
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   virtual const char * backend() const noexcept = 0;
 
 protected:
-  std::string name_;
+  std::string name_;  //!< The encoder name.
 };
 
 #ifdef TURBOJPEG_AVAILABLE
@@ -63,12 +83,34 @@ protected:
 class CpuJpegEncoder final : public JpegEncoderBase
 {
 public:
-  CpuJpegEncoder(std::string name);
+  /**
+   * @brief Constructor.
+   *
+   * @param name The encoder name.
+   */
+  explicit CpuJpegEncoder(std::string name);
+
+  /**
+   * @brief Destructor.
+   */
   ~CpuJpegEncoder();
 
+  /**
+   * @brief Encode an image into JPEG format using TurboJPEG library.
+   *
+   * @param msg The input image message.
+   * @param quality The JPEG quality level (default: 90).
+   * @param format The image format (default: RGB).
+   * @return Unique pointer to the encoded JPEG image.
+   */
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
 private:
@@ -85,12 +127,34 @@ private:
 class JetsonJpegEncoder final : public JpegEncoderBase
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param name The encoder name.
+   */
   explicit JetsonJpegEncoder(std::string name);
+
+  /**
+   * @brief Destructor.
+   */
   ~JetsonJpegEncoder();
 
+  /**
+   * @brief Encode an image into JPEG format using Jetson Inference library.
+   *
+   * @param msg The input image message.
+   * @param quality The JPEG quality level (default: 90).
+   * @param format The image format (default: RGB).
+   * @return Unique pointer to the encoded JPEG image.
+   */
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
 private:
@@ -111,28 +175,56 @@ private:
 
 #ifdef NVJPEG_AVAILABLE
 /**
- * JPEG encoder using NVIDIA NVJPEG library.
+ * @brief JPEG encoder using NVIDIA NVJPEG library.
  */
 class NvJpegEncoder final : public JpegEncoderBase
 {
 public:
-  NvJpegEncoder(std::string name);
+  /**
+   * @brief Constructor.
+   *
+   * @param name The encoder name.
+   */
+  explicit NvJpegEncoder(std::string name);
+
+  /**
+   * @brief Destructor.
+   */
   ~NvJpegEncoder();
 
+  /**
+   * @brief Encode an image into JPEG format using NVIDIA NVJPEG library.
+   *
+   * @param msg The input image message.
+   * @param quality The JPEG quality level (default: 90).
+   * @param format The image format (default: RGB).
+   * @return Unique pointer to the encoded JPEG image.
+   */
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
 
+  /**
+   * @brief Get the backend name.
+   *
+   * @return The backend name.
+   */
   const char * backend() const noexcept override;
 
 private:
+  /**
+   * @brief Convert an image message to an NVJPEG image.
+   *
+   * @param msg The input image message.
+   * @return NVJPEG image.
+   */
   nvjpegImage_t to_nv_image(const Image & msg);
 
-  cudaStream_t stream_;
-  nvjpegHandle_t handle_;
-  nvjpegEncoderState_t state_;
-  nvjpegEncoderParams_t params_;
-  nvjpegInputFormat_t input_format_;
-  nvjpegChromaSubsampling_t subsampling_;
+  cudaStream_t stream_;                    //!< CUDA stream for asynchronous operations.
+  nvjpegHandle_t handle_;                  //!< NVJPEG handle for JPEG encoding.
+  nvjpegEncoderState_t state_;             //!< NVJPEG encoder state.
+  nvjpegEncoderParams_t params_;           //!< NVJPEG encoder parameters.
+  nvjpegInputFormat_t input_format_;       //!< NVJPEG input format.
+  nvjpegChromaSubsampling_t subsampling_;  //!< NVJPEG chroma subsampling.
 };
 #endif  // NVJPEG_AVAILABLE
 }  // namespace nova::compression

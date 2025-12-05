@@ -26,6 +26,11 @@ namespace nova::pipeline
 /**
  * @brief Build a rectifier based on the given camera information and alpha value.
  *
+ * @note This function creates a rectifier with the following rules:
+ *  * If NPP is available, it creates an NPPRectifier.
+ *  * If OpenCV CUDA is available, it creates an OpenCVRectifierGPU.
+ *  * If none of the above are available, it creates an OpenCVRectifierCPU.
+ *
  * @param info The camera information.
  * @param alpha The alpha value.
  * @return std::shared_ptr<RectifierBase> The rectifier.

@@ -23,7 +23,13 @@
 namespace nova::compression
 {
 /**
- * Build a JPEG encoder.
+ * @brief Build a JPEG encoder.
+ *
+ * @note This function creates a JPEG encoder with the following rules:
+ *  * If Jetson is available, it creates a JetsonJpegEncoder.
+ *  * If NVJPEG is available, it creates a NvJpegEncoder.
+ *  * If TurboJPEG is available, it creates a CpuJpegEncoder.
+ *  * If none of the above are available, it throws a runtime_error.
  *
  * @param name The name of the encoder.
  * @return A shared pointer to the encoder.
