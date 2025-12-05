@@ -7,7 +7,22 @@ find_package(CUDAToolkit)
 nova_package()
 autoware_package()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED src/imgproc_node.cpp src/qos.cpp)
+if(${image_transport_VERSION} VERSION_GREATER_EQUAL "5.0.0")
+  add_definitions(-DIMAGE_TRANSPORT_USE_PUBLISHER_T)
+  add_definitions(-DIMAGE_TRANSPORT_NEEDS_PUBLISHEROPTIONS)
+endif()
+if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.0.0")
+  add_definitions(-DIMAGE_TRANSPORT_RESOLVES_BASE_TOPIC)
+endif()
+if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.3.0")
+  add_definitions(-DIMAGE_TRANSPORT_USE_QOS)
+endif()
+if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.4.0")
+  add_definitions(-DIMAGE_TRANSPORT_USE_NODEINTERFACE)
+endif()
+
+ament_auto_add_library(${PROJECT_NAME} SHARED src/imgproc_node.cpp src/qos.cpp
+                       src/publisher.cpp)
 
 target_link_libraries(
   ${PROJECT_NAME} ${CUDA_LIBRARIES} ${OpenCV_LIBRARIES}
@@ -15,6 +30,8 @@ target_link_libraries(
 
 rclcpp_components_register_node(${PROJECT_NAME} PLUGIN "nova::ros::ImgProcNode"
                                 EXECUTABLE ${PROJECT_NAME}_imgproc_node)
+
+pluginlib_export_plugin_description_file(${PROJECT_NAME} plugin_description.xml)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "")
 install(TARGETS ${PROJECT_NAME} EXPORT export_${PROJECT_NAME})

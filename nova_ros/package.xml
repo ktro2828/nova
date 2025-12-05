@@ -10,9 +10,13 @@
   <buildtool_depend>autoware_cmake</buildtool_depend>
   <buildtool_depend>nova_cmake</buildtool_depend>
 
+  <depend>ffmpeg_encoder_decoder</depend>
   <depend>image_transport</depend>
   <depend>nova_compression</depend>
+  <depend>nova_msgs</depend>
   <depend>nova_pipeline</depend>
+  <depend>pluginlib</depend>
+  <depend>rcl_interfaces</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>sensor_msgs</depend>
