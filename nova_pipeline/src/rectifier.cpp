@@ -82,6 +82,8 @@ static CameraInfo compute_maps(
 
   return camera_info_rect;
 }
+
+static const char * OPENCV_CPU_BACKEND = "OpenCV CPU";
 }  // namespace
 
 OpenCVRectifierCPU::OpenCVRectifierCPU(const CameraInfo & info, double alpha)
@@ -90,6 +92,11 @@ OpenCVRectifierCPU::OpenCVRectifierCPU(const CameraInfo & info, double alpha)
   map_y_ = cv::Mat(info.height, info.width, CV_32FC1);
 
   camera_info_rect_ = compute_maps(info, map_x_.ptr<float>(), map_y_.ptr<float>(), alpha);
+}
+
+const char * OpenCVRectifierCPU::backend() const noexcept
+{
+  return OPENCV_CPU_BACKEND;
 }
 
 Image::UniquePtr OpenCVRectifierCPU::rectify(const Image & msg)
@@ -113,6 +120,11 @@ Image::UniquePtr OpenCVRectifierCPU::rectify(const Image & msg)
 }
 
 #ifdef OPENCV_CUDA_AVAILABLE
+namespace
+{
+static const char * OPENCV_CUDA_BACKEND = "OpenCV CUDA";
+}
+
 OpenCVRectifierGPU::OpenCVRectifierGPU(const CameraInfo & info, double alpha)
 {
   cv::Mat map_x(info.height, info.width, CV_32FC1);
@@ -122,6 +134,11 @@ OpenCVRectifierGPU::OpenCVRectifierGPU(const CameraInfo & info, double alpha)
 
   map_x_ = cv::cuda::GpuMat(map_x);
   map_y_ = cv::cuda::GpuMat(map_y);
+}
+
+const char * OpenCVRectifierGPU::backend() const noexcept
+{
+  return OPENCV_CUDA_BACKEND;
 }
 
 Image::UniquePtr OpenCVRectifierGPU::rectify(const Image & msg)
@@ -150,6 +167,11 @@ Image::UniquePtr OpenCVRectifierGPU::rectify(const Image & msg)
 #endif  // OPENCV_CUDA_AVAILABLE
 
 #ifdef NPP_AVAILABLE
+namespace
+{
+static const char * NPP_BACKEND = "NVIDIA NPP";
+}
+
 NPPRectifier::NPPRectifier(int width, int height, const Npp32f * map_x, const Npp32f * map_y)
 : pxl_map_x_(nullptr), pxl_map_y_(nullptr)
 {
@@ -231,6 +253,11 @@ NPPRectifier::~NPPRectifier()
   }
 
   cudaStreamDestroy(stream_);
+}
+
+const char * NPPRectifier::backend() const noexcept
+{
+  return NPP_BACKEND;
 }
 
 Image::UniquePtr NPPRectifier::rectify(const Image & msg)

@@ -50,6 +50,7 @@ class JpegEncoderBase
 public:
   explicit JpegEncoderBase(std::string name) : name_(std::move(name)) {}
   virtual CompressedImage::UniquePtr encode(const Image & img, int quality, ImageFormat format) = 0;
+  virtual const char * backend() const noexcept = 0;
 
 protected:
   std::string name_;
@@ -67,6 +68,8 @@ public:
 
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
+
+  const char * backend() const noexcept override;
 
 private:
   tjhandle handle_;         //!< TurboJPEG handle.
@@ -87,6 +90,8 @@ public:
 
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
+
+  const char * backend() const noexcept override;
 
 private:
   NvJPEGEncoder * encoder_;            //!< NvJPEG encoder handle.
@@ -116,6 +121,8 @@ public:
 
   CompressedImage::UniquePtr encode(
     const Image & msg, int quality = 90, ImageFormat format = ImageFormat::RGB) override;
+
+  const char * backend() const noexcept override;
 
 private:
   nvjpegImage_t to_nv_image(const Image & msg);

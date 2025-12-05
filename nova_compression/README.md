@@ -4,7 +4,7 @@
 
 The following table summarizes the supported JPEG encoders:
 
-| Encoder                                | Library                                                                             | Device |
+| Encoder                                | Backend                                                                             | Device |
 | -------------------------------------- | ----------------------------------------------------------------------------------- | ------ |
 | `nova::compression::CpuJpegEncoder`    | [TurboJPEG](https://github.com/libjpeg-turbo/libjpeg-turbo)                         | CPU    |
 | `nova::compression::NvJpegEncoder`     | [nvJPEG](https://developer.nvidia.com/nvjpeg)                                       | GPU    |

@@ -4,7 +4,7 @@
 
 The following table summarizes the supported rectifiers:
 
-| Rectifier                            | Library                                                                            | Device |
+| Rectifier                            | Backend                                                                            | Device |
 | ------------------------------------ | ---------------------------------------------------------------------------------- | ------ |
 | `nova::pipeline::OpenCVRectifierCPU` | [OpenCV](https://opencv.org/)                                                      | CPU    |
 | `nova::pipeline::OpenCVRectifierGPU` | [OpenCV CUDA](https://opencv.org/platforms/cuda/)                                  | GPU    |

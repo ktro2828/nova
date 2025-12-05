@@ -29,6 +29,11 @@
 namespace nova::compression
 {
 #ifdef TURBOJPEG_AVAILABLE
+namespace
+{
+static const char * CPU_BACKEND = "CPU";
+}
+
 CpuJpegEncoder::CpuJpegEncoder(std::string name)
 : JpegEncoderBase(std::move(name)), buffer_(nullptr), size_(0)
 {
@@ -41,6 +46,11 @@ CpuJpegEncoder::~CpuJpegEncoder()
     tjFree(buffer_);
   }
   tjDestroy(handle_);
+}
+
+const char * CpuJpegEncoder::backend() const noexcept
+{
+  return CPU_BACKEND;
 }
 
 CompressedImage::UniquePtr CpuJpegEncoder::encode(
@@ -86,6 +96,11 @@ CompressedImage::UniquePtr CpuJpegEncoder::encode(
 #endif  // TURBOJPEG_AVAILABLE
 
 #ifdef JETSON_AVAILABLE
+namespace
+{
+static const char * JETSON_BACKEND = "Jetson";
+}
+
 JetsonJpegEncoder::JetsonJpegEncoder(std::string name) : JpegEncoderBase(std::move(name)),
 {
   CHECK_CUDA(cudaStreamCreate(&stream_));
@@ -101,6 +116,11 @@ JetsonJpegEncoder::~JetsonJpegEncoder()
     nppiFree(p);
   }
   CHECK_CUDA(cudaStreamDestroy(stream_));
+}
+
+const char * JetsonJpegEncoder::backend() const noexcept
+{
+  return JETSON_BACKEND;
 }
 
 CompressedImage::UniquePtr JetsonJpegEncoder::encode(const Image & msg, int quality, int format)
@@ -198,6 +218,11 @@ CompressedImage::UniquePtr JetsonJpegEncoder::encode(const Image & msg, int qual
 #endif  // JETSON_AVAILABLE
 
 #ifdef NVJPEG_AVAILABLE
+namespace
+{
+static const char * NVJPEG_BACKEND = "NVJPEG";
+}
+
 NvJpegEncoder::NvJpegEncoder(std::string name) : JpegEncoderBase(std::move(name))
 {
   CHECK_CUDA(cudaStreamCreate(&stream_));
@@ -216,6 +241,11 @@ NvJpegEncoder::~NvJpegEncoder()
   CHECK_NVJPEG(nvjpegEncoderStateDestroy(state_));
   CHECK_NVJPEG(nvjpegDestroy(handle_));
   CHECK_CUDA(cudaStreamDestroy(stream_));
+}
+
+const char * NvJpegEncoder::backend() const noexcept
+{
+  return NVJPEG_BACKEND;
 }
 
 CompressedImage::UniquePtr NvJpegEncoder::encode(const Image & msg, int quality, ImageFormat format)

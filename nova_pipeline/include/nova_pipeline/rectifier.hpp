@@ -37,6 +37,7 @@ class RectifierBase
 {
 public:
   virtual ~RectifierBase() {}
+  virtual const char * backend() const noexcept = 0;
   virtual Image::UniquePtr rectify(const Image & msg) = 0;
   bool is_camera_info_ready() const noexcept { return camera_info_rect_.has_value(); }
   CameraInfo & camera_info() { return camera_info_rect_.value(); }
@@ -50,6 +51,8 @@ class OpenCVRectifierCPU : public RectifierBase
 {
 public:
   explicit OpenCVRectifierCPU(const CameraInfo & info, double alpha = 0.0);
+
+  const char * backend() const noexcept override;
 
   Image::UniquePtr rectify(const Image & msg) override;
 
@@ -65,6 +68,8 @@ class OpenCVRectifierGPU : public RectifierBase
 {
 public:
   explicit OpenCVRectifierGPU(const CameraInfo & info, double alpha = 0.0);
+
+  const char * backend() const noexcept override;
 
   Image::UniquePtr rectify(const Image & msg) override;
 
@@ -82,7 +87,7 @@ public:
   explicit NPPRectifier(const CameraInfo & info, double alpha = 0.0);
   ~NPPRectifier();
 
-  cudaStream_t & cuda_stream() { return stream_; }
+  const char * backend() const noexcept override;
 
   Image::UniquePtr rectify(const Image & msg) override;
 

@@ -29,6 +29,11 @@ ImgProcNode::ImgProcNode(const rclcpp::NodeOptions & options) : Node("imgproc_no
 {
   raw_jpeg_encoder_ = compression::build_jpeg_encoder("raw_jpeg_encoder");
   rectified_jpeg_encoder_ = compression::build_jpeg_encoder("rectified_jpeg_encoder");
+  RCLCPP_INFO_STREAM(
+    this->get_logger(), "JPEG encoder backend for raw image: " << raw_jpeg_encoder_->backend());
+  RCLCPP_INFO_STREAM(
+    this->get_logger(),
+    "JPEG encoder backend for rectified image: " << rectified_jpeg_encoder_->backend());
 
   // QoS
   qos_request_timer_ = rclcpp::create_timer(
@@ -142,6 +147,8 @@ void ImgProcNode::on_camera_info(sensor_msgs::msg::CameraInfo::ConstSharedPtr ms
     return;
   }
   rectifier_ = pipeline::build_rectifier(*msg, alpha);
+
+  RCLCPP_INFO_STREAM(this->get_logger(), "Rectifier backend: " << rectifier_->backend());
 
   // unsubscribe
   camera_info_subscription_.reset();
