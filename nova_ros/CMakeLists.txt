@@ -22,7 +22,7 @@ if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.4.0")
 endif()
 
 ament_auto_add_library(${PROJECT_NAME} SHARED src/imgproc_node.cpp src/qos.cpp
-                       src/publisher.cpp)
+                       src/publisher.cpp src/subscriber.cpp)
 
 target_link_libraries(
   ${PROJECT_NAME} ${CUDA_LIBRARIES} ${OpenCV_LIBRARIES}

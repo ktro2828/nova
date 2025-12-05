@@ -8,4 +8,13 @@
       This plugin encodes frames into compressed video messages
     </description>
   </class>
+  <class
+    name="image_transport/nova_sub"
+    type="nova::ros::Subscriber"
+    base_class_type="image_transport::SubscriberPlugin"
+  >
+    <description>
+      This plugin decodes compressed video messages into frames
+    </description>
+  </class>
 </library>
