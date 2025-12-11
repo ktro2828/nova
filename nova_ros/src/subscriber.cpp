@@ -160,3 +160,7 @@ void Subscriber::internalCallback(
   }
 }
 }  // namespace nova::ros
+
+#include <pluginlib/class_list_macros.hpp>
+
+PLUGINLIB_EXPORT_CLASS(nova::ros::Subscriber, image_transport::SubscriberPlugin)
