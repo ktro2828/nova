@@ -44,6 +44,5 @@ inline std::vector<std::string> split_av_option(const std::string & option)
 {
   return ffmpeg_encoder_decoder::utils::split_by_char(option, ':');
 }
-
 }  // namespace nova::ros::utility
 #endif  // NOVA_ROS__UTILITY_HPP_

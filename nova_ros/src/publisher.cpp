@@ -241,3 +241,7 @@ void Publisher::publish(const Image & msg, const PublisherTFn & publish_fn) cons
   me->encoder_.encodeImage(msg);
 }
 }  // namespace nova::ros
+
+#include <pluginlib/class_list_macros.hpp>
+
+PLUGINLIB_EXPORT_CLASS(nova::ros::Publisher, image_transport::PublisherPlugin)

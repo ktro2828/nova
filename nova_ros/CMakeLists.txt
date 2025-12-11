@@ -21,8 +21,14 @@ if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.4.0")
   add_definitions(-DIMAGE_TRANSPORT_USE_NODEINTERFACE)
 endif()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED src/imgproc_node.cpp src/qos.cpp
-                       src/publisher.cpp src/subscriber.cpp)
+ament_auto_add_library(
+  ${PROJECT_NAME}
+  SHARED
+  src/imgproc_node.cpp
+  src/qos.cpp
+  src/parameter_definition.cpp
+  src/publisher.cpp
+  src/subscriber.cpp)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -35,7 +41,7 @@ target_link_libraries(
 rclcpp_components_register_node(${PROJECT_NAME} PLUGIN "nova::ros::ImgProcNode"
                                 EXECUTABLE ${PROJECT_NAME}_imgproc_node)
 
-pluginlib_export_plugin_description_file(${PROJECT_NAME} plugin_description.xml)
+pluginlib_export_plugin_description_file(image_transport plugin_description.xml)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_INCLUDE_DIRECTORIES
                                              $<INSTALL_INTERFACE:include>)
