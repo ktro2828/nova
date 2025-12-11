@@ -15,7 +15,6 @@
 #include "nova_example/listener.hpp"
 
 #include <image_transport/image_transport.hpp>
-#include <image_transport/transport_hints.hpp>
 
 namespace nova::example
 {
@@ -24,8 +23,8 @@ Listener::Listener(const rclcpp::NodeOptions & options) : Node("listener", optio
   // set TransportHints to "nova"
   subscriber_ = image_transport::create_subscription(
     this, "nova/image",
-    [this](const sensor_msgs::msg::Image::ConstSharedPtr & msg) { this->callback(msg); }, "nova",
-    rclcpp::QoS(1).get_rmw_qos_profile());
+    [this](const sensor_msgs::msg::Image::ConstSharedPtr & msg) { this->callback(msg); },
+    "compressed_video", rclcpp::QoS(1).get_rmw_qos_profile());
 }
 
 void Listener::callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)

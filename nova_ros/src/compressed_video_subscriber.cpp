@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "nova_ros/subscriber.hpp"
+#include "nova_ros/compressed_video_subscriber.hpp"
 
 #include "nova_ros/parameter_definition.hpp"
 
@@ -30,16 +30,16 @@ using std::placeholders::_2;
 using ParameterValue = ParameterDefinition::ParameterValue;
 using ParameterDescriptor = ParameterDefinition::ParameterDescriptor;
 
-Subscriber::Subscriber()
+CompressedVideoSubscriber::CompressedVideoSubscriber()
 {
 }
 
-Subscriber::~Subscriber()
+CompressedVideoSubscriber::~CompressedVideoSubscriber()
 {
   decoder_.reset();
 }
 
-void Subscriber::shutdown()
+void CompressedVideoSubscriber::shutdown()
 {
   if (decoder_.isInitialized()) {
     decoder_.flush();  // may cause additional frame_ready() calls!
@@ -48,12 +48,12 @@ void Subscriber::shutdown()
   SimpleSubscriberPlugin::shutdown();
 }
 
-void Subscriber::frame_ready(const Image::ConstSharedPtr & img, bool) const
+void CompressedVideoSubscriber::frame_ready(const Image::ConstSharedPtr & img, bool) const
 {
   (*user_callback_)(img);
 }
 
-void Subscriber::subscribeImpl(
+void CompressedVideoSubscriber::subscribeImpl(
   NodeType node, const std::string & base_topic, const Callback & callback, QoSType custom_qos,
   rclcpp::SubscriptionOptions opt)
 {
@@ -68,7 +68,7 @@ void Subscriber::subscribeImpl(
 #endif
 }
 
-void Subscriber::initialize(NodeType node, const std::string & base_topic_o)
+void CompressedVideoSubscriber::initialize(NodeType node, const std::string & base_topic_o)
 {
   node_ = node;
 #ifdef IMAGE_TRANSPORT_RESOLVES_BASE_TOPIC
@@ -90,7 +90,7 @@ void Subscriber::initialize(NodeType node, const std::string & base_topic_o)
   parameter_namespace_ = param_base_name + "." + getTransportName() + ".";
 }
 
-std::string Subscriber::get_decoders_from_map(const std::string & encoding)
+std::string CompressedVideoSubscriber::get_decoders_from_map(const std::string & encoding)
 {
   const auto splits = ffmpeg_encoder_decoder::utils::split_encoding(encoding);
   std::string decoders;
@@ -115,7 +115,7 @@ std::string Subscriber::get_decoders_from_map(const std::string & encoding)
   return decoders;
 }
 
-void Subscriber::internalCallback(
+void CompressedVideoSubscriber::internalCallback(
   const CompressedVideo::ConstSharedPtr & msg, const Callback & user_callback)
 {
   if (decoder_.isInitialized()) {
@@ -141,7 +141,7 @@ void Subscriber::internalCallback(
   for (const auto & dec : ffmpeg_encoder_decoder::utils::split_decoders(decoder_names)) {
     try {
       if (!decoder_.initialize(
-            msg->format, std::bind(&Subscriber::frame_ready, this, _1, _2), dec)) {
+            msg->format, std::bind(&CompressedVideoSubscriber::frame_ready, this, _1, _2), dec)) {
         // cannot initialize decoder
         continue;
       }
@@ -163,4 +163,4 @@ void Subscriber::internalCallback(
 
 #include <pluginlib/class_list_macros.hpp>
 
-PLUGINLIB_EXPORT_CLASS(nova::ros::Subscriber, image_transport::SubscriberPlugin)
+PLUGINLIB_EXPORT_CLASS(nova::ros::CompressedVideoSubscriber, image_transport::SubscriberPlugin)

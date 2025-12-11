@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "nova_ros/publisher.hpp"
+#include "nova_ros/compressed_video_publisher.hpp"
 
 #include "nova_ros/parameter_definition.hpp"
 #include "nova_ros/utility.hpp"
@@ -122,15 +122,16 @@ static const ParameterDefinition params[] = {
    "gop_size not set, defaulting to 1!"},
 };
 
-Publisher::Publisher()
+CompressedVideoPublisher::CompressedVideoPublisher()
 {
 }
 
-Publisher::~Publisher()
+CompressedVideoPublisher::~CompressedVideoPublisher()
 {
 }
 
-void Publisher::declare_parameter(NodeType node, const ParameterDefinition & definition)
+void CompressedVideoPublisher::declare_parameter(
+  NodeType node, const ParameterDefinition & definition)
 {
   const auto value = definition.declare_parameter(node, parameter_namespace_);
   const auto & name = definition.descriptor.name;
@@ -153,7 +154,7 @@ void Publisher::declare_parameter(NodeType node, const ParameterDefinition & def
   }
 }
 
-void Publisher::handle_av_options(const std::string & options)
+void CompressedVideoPublisher::handle_av_options(const std::string & options)
 {
   const auto split = utility::split_av_options(options);
   for (const auto & option : split) {
@@ -164,7 +165,7 @@ void Publisher::handle_av_options(const std::string & options)
   }
 }
 
-void Publisher::callback(
+void CompressedVideoPublisher::callback(
   const std::string & frame_id, const rclcpp::Time & stamp, const std::string & /*codec*/,
   uint32_t /*width*/, uint32_t /*height*/, uint64_t /*pts*/, uint8_t /*flags*/, uint8_t * data,
   size_t sz)
@@ -182,14 +183,14 @@ void Publisher::callback(
 }
 
 #ifdef IMAGE_TRANSPORT_NEEDS_PUBLISHEROPTIONS
-void Publisher::advertiseImpl(
+void CompressedVideoPublisher::advertiseImpl(
   NodeType node, const std::string & base_topic, QoSType custom_qos, rclcpp::PublisherOptions opt)
 {
   auto qos = initialize(node, base_topic, custom_qos);
   SimplePublisherPlugin<CompressedVideo>::advertiseImpl(node, base_topic, qos, opt);
 }
 #else
-void Publisher::advertiseImpl(
+void CompressedVideoPublisher::advertiseImpl(
   NodeType node, const std::string & base_topic, rmw_qos_profile_t custom_qos)
 {
   auto qos = initialize(node, base_topic, custom_qos);
@@ -197,7 +198,7 @@ void Publisher::advertiseImpl(
 }
 #endif
 
-Publisher::QoSType Publisher::initialize(
+CompressedVideoPublisher::QoSType CompressedVideoPublisher::initialize(
   NodeType node, const std::string & base_topic, QoSType custom_qos)
 {
   // namespace handling code lifted from compressed_image_transport
@@ -226,14 +227,15 @@ Publisher::QoSType Publisher::initialize(
   return (custom_qos);
 }
 
-void Publisher::publish(const Image & msg, const PublisherTFn & publish_fn) const
+void CompressedVideoPublisher::publish(const Image & msg, const PublisherTFn & publish_fn) const
 {
-  Publisher * me = const_cast<Publisher *>(this);
+  CompressedVideoPublisher * me = const_cast<CompressedVideoPublisher *>(this);
   me->publish_function_ = &publish_fn;
   if (!me->encoder_.isInitialized()) {
     if (!me->encoder_.initialize(
           msg.width, msg.height,
-          std::bind(&Publisher::callback, me, _1, _2, _3, _4, _5, _6, _7, _8, _9), msg.encoding)) {
+          std::bind(&CompressedVideoPublisher::callback, me, _1, _2, _3, _4, _5, _6, _7, _8, _9),
+          msg.encoding)) {
       return;
     }
   }
@@ -244,4 +246,4 @@ void Publisher::publish(const Image & msg, const PublisherTFn & publish_fn) cons
 
 #include <pluginlib/class_list_macros.hpp>
 
-PLUGINLIB_EXPORT_CLASS(nova::ros::Publisher, image_transport::PublisherPlugin)
+PLUGINLIB_EXPORT_CLASS(nova::ros::CompressedVideoPublisher, image_transport::PublisherPlugin)

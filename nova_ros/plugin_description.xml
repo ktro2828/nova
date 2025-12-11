@@ -1,7 +1,7 @@
 <library path="nova_ros">
   <class
-    name="image_transport/nova_pub"
-    type="nova::ros::Publisher"
+    name="image_transport/compressed_video_pub"
+    type="nova::ros::CompressedVideoPublisher"
     base_class_type="image_transport::PublisherPlugin"
   >
     <description>
@@ -9,8 +9,8 @@
     </description>
   </class>
   <class
-    name="image_transport/nova_sub"
-    type="nova::ros::Subscriber"
+    name="image_transport/compressed_video_sub"
+    type="nova::ros::CompressedVideoSubscriber"
     base_class_type="image_transport::SubscriberPlugin"
   >
     <description>
