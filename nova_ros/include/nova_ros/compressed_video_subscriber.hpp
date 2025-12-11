@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NOVA_ROS__SUBSCRIBER_HPP_
-#define NOVA_ROS__SUBSCRIBER_HPP_
+#ifndef NOVA_ROS__COMPRESSED_VIDEO_SUBSCRIBER_HPP_
+#define NOVA_ROS__COMPRESSED_VIDEO_SUBSCRIBER_HPP_
 
 #include <ffmpeg_encoder_decoder/decoder.hpp>
 #include <image_transport/simple_subscriber_plugin.hpp>
@@ -39,13 +39,13 @@ using NodeType = image_transport::RequiredInterfaces;
 using NodeType = rclcpp::Node *;
 #endif
 
-class Subscriber : public image_transport::SimpleSubscriberPlugin<CompressedVideo>
+class CompressedVideoSubscriber : public image_transport::SimpleSubscriberPlugin<CompressedVideo>
 {
 public:
-  Subscriber();
-  ~Subscriber() override;
+  CompressedVideoSubscriber();
+  ~CompressedVideoSubscriber() override;
 
-  std::string getTransportName() const override { return "nova"; }
+  std::string getTransportName() const override { return "compressedVideo"; }
 
 protected:
   void internalCallback(
@@ -72,4 +72,4 @@ private:
   std::string parameter_namespace_;
 };
 }  // namespace nova::ros
-#endif  // NOVA_ROS__SUBSCRIBER_HPP_
+#endif  // NOVA_ROS__COMPRESSED_VIDEO_SUBSCRIBER_HPP_

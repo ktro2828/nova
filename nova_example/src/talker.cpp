@@ -24,7 +24,7 @@ namespace nova::example
 Talker::Talker(const rclcpp::NodeOptions & options) : Node("talker", options)
 {
   // declare transport type parameter as "nova"
-  this->declare_parameter<std::string>("image_transport", "nova");
+  this->declare_parameter<std::string>("image_transport", "compressed_video");
   publisher_ =
     image_transport::create_publisher(this, "nova/image", rclcpp::QoS(1).get_rmw_qos_profile());
 

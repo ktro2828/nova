@@ -27,8 +27,8 @@ ament_auto_add_library(
   src/imgproc_node.cpp
   src/qos.cpp
   src/parameter_definition.cpp
-  src/publisher.cpp
-  src/subscriber.cpp)
+  src/compressed_video_publisher.cpp
+  src/compressed_video_subscriber.cpp)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

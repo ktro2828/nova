@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NOVA_ROS__PUBLISHER_HPP_
-#define NOVA_ROS__PUBLISHER_HPP_
+#ifndef NOVA_ROS__COMPRESSED_VIDEO_PUBLISHER_HPP_
+#define NOVA_ROS__COMPRESSED_VIDEO_PUBLISHER_HPP_
 
 #include "nova_ros/parameter_definition.hpp"
 
@@ -30,7 +30,7 @@ namespace nova::ros
 {
 using CompressedVideo = nova_msgs::msg::CompressedVideo;
 
-class Publisher : public image_transport::SimplePublisherPlugin<CompressedVideo>
+class CompressedVideoPublisher : public image_transport::SimplePublisherPlugin<CompressedVideo>
 {
 public:
 #ifdef IMAGE_TRANSPORT_USE_PUBLISHER_T
@@ -49,9 +49,9 @@ public:
   using NodeType = rclcpp::Node *;
 #endif
 
-  Publisher();
-  ~Publisher() override;
-  std::string getTransportName() const override { return "nova"; }
+  CompressedVideoPublisher();
+  ~CompressedVideoPublisher() override;
+  std::string getTransportName() const override { return "compressedVideo"; }
 
 protected:
 #ifdef IMAGE_TRANSPORT_NEEDS_PUBLISHEROPTIONS
@@ -78,4 +78,4 @@ private:
   std::string parameter_namespace_;
 };
 }  // namespace nova::ros
-#endif  // NOVA_ROS__PUBLISHER_HPP_
+#endif  // NOVA_ROS__COMPRESSED_VIDEO_PUBLISHER_HPP_
