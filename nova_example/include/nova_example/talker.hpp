@@ -15,7 +15,21 @@
 #ifndef NOVA_EXAMPLE__TALKER_HPP_
 #define NOVA_EXAMPLE__TALKER_HPP_
 
+#include <image_transport/image_transport.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 namespace nova::example
 {
-}
+class Talker : public rclcpp::Node
+{
+public:
+  explicit Talker(const rclcpp::NodeOptions & options);
+
+private:
+  void callback();
+
+  image_transport::Publisher publisher_;  //!< Publisher for compressed video messages
+  rclcpp::TimerBase::SharedPtr timer_;    //!< Timer for publishing compressed video messages
+};
+}  // namespace nova::example
 #endif  // NOVA_EXAMPLE__TALKER_HPP_

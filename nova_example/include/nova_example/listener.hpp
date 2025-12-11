@@ -15,7 +15,22 @@
 #ifndef NOVA_EXAMPLE__LISTENER_HPP_
 #define NOVA_EXAMPLE__LISTENER_HPP_
 
+#include <image_transport/subscriber.hpp>
+#include <rclcpp/rclcpp.hpp>
+
+#include <sensor_msgs/msg/image.hpp>
+
 namespace nova::example
 {
-}
+class Listener : public rclcpp::Node
+{
+public:
+  explicit Listener(const rclcpp::NodeOptions & options);
+
+private:
+  void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+
+  image_transport::Subscriber subscriber_;  //!< Subscriber for compressed video messages
+};
+}  // namespace nova::example
 #endif  // NOVA_EXAMPLE__LISTENER_HPP_

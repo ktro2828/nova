@@ -12,6 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "nova_example/listener.hpp"
+
+#include <image_transport/image_transport.hpp>
+#include <image_transport/transport_hints.hpp>
+
 namespace nova::example
 {
+Listener::Listener(const rclcpp::NodeOptions & options) : Node("listener", options)
+{
+  // set TransportHints to "nova"
+  subscriber_ = image_transport::create_subscription(
+    this, "nova/image",
+    [this](const sensor_msgs::msg::Image::ConstSharedPtr & msg) { this->callback(msg); }, "nova",
+    rclcpp::QoS(1).get_rmw_qos_profile());
 }
+
+void Listener::callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
+{
+  RCLCPP_INFO(
+    get_logger(), "Received Image %ux%u encoding=%s", msg->width, msg->height,
+    msg->encoding.c_str());
+}
+}  // namespace nova::example
+
+#include <rclcpp_components/register_node_macro.hpp>
+
+RCLCPP_COMPONENTS_REGISTER_NODE(nova::example::Listener)
